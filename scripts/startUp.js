@@ -32,5 +32,13 @@ for (var i = 0; i < closeBtns.length; ++i) {
     closeBtns[i].addEventListener("click",closeAbout);
 }
 
+
+//Clear out local storage
+localStorage.clear();
+//Add empty array of round objects to local storage
+localStorage.setItem("rounds",JSON.stringify([]));
+//Initially, 0 rounds are stored
+localStorage.setItem("roundCount","0");
+
 //Execute function to set start state of app
 startUp();

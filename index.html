@@ -24,10 +24,10 @@
     <link rel="stylesheet"
     href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
     integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
-    crossorigin="anonymous">    
+    crossorigin="anonymous">
     <link rel="stylesheet"
-    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
     crossorigin="anonymous">
     <!-- Our local CSS stylesheet -->
     <link rel="stylesheet" href = "styles/navbar.css">
@@ -90,16 +90,13 @@
 <!-- END SIDEMENU -->
 
 <!-- BEGIN FIXED BOTTOM BAR -->
-<div id ="bottomBar" class="bottombar" style="z-index: 100">
-<a id="feedMode" class="bottomBarBtn"><span style="display:block; padding-top:3px"
-class="nonMenuItem fas fa-th-list"></span><span style="display:block;font-size:
-small">Feed</span></a>
-<a id="roundsMode" class="bottomBarBtn"><span style="display:block; padding-top:3px"
-class="nonMenuItem fas fa-history"></span><span style="display:block;font-size:
-small">Rounds</span></a>
-<a id="coursesMode" class="bottomBarBtn"><span style="display:block; padding-top:3px"
-class="nonMenuItem fas fa-flag"></span><span style="display:block;font-size:
-small">Courses</span></a> 
+<div id ="bottomBar" class="bottombar">
+<a id="feedMode" class="bottomBarBtn"><span class="bottomBarIcon nonMenuItem
+    fas fa-th-list"></span><span class="bottomBarText">Feed</span></a>
+<a id="roundsMode" class="bottomBarBtn"><span class="bottomBarIcon nonMenuItem
+   fas fa-history"></span><span class="bottomBarText">Rounds</span></a>
+<a id="coursesMode" class="bottomBarBtn"><span class="bottomBarIcon nonMenuItem 
+   fas fa-flag"></span><span class="bottomBarText">Courses</span></a> 
 </div>
 <!-- END FIXED BOTTOM BAR-->
  
@@ -159,8 +156,21 @@ small">Courses</span></a>
 
   <!-- Rounds page displaying the user's round history -->
   <div id="roundsModeMainDiv" class="roundsModeDiv paddedPage">
-      <h1 align="center">Rounds Page</h1>
-    <div w3-include-html="html/underConstruction.html" ></div>
+      <h1></h1>
+      <table id="myRoundsTable" class="table table-hover">
+        <thead class="thead-dark">
+          <th scope="col">Date</th>
+          <th scope="col">Course</th>
+          <th scope="col">Score</th>
+          <th scope="col">View/Edit...</th>
+          <th scope="col">Delete</th>
+        </thead>
+        <tbody>
+          <tr>
+           <td colspan="5" style="font-style: italic">No rounds added yet</td>
+          </tr> 
+        </tbody>
+      </table>
   </div>
 
     <!-- Page for logging a new round -->
@@ -172,32 +182,32 @@ small">Courses</span></a>
               <input id="roundDate" class="form-control form-center" type="date" 
               required>
           </label>
-          <p></p>
+          <br>
           <label for="roundCourse">Course:
               <input id="roundCourse" class="form-control form-center" type="text" 
               placeholder="Course played" size="50" maxlength="50" required>
           </label>
-          <p></p>
+          <br>
           <label for="roundType">Type:
-              <select name="roundType" class="form-control form-center">
+              <select id="roundType" class="form-control form-center">
                 <option value="practice" selected>Practice</option>
                 <option value="tournament">Tournament</option>
               </select> 
           </label>
-          <p></p>
+          <br>
           <label for="roundHoles"># Holes:
-              <select name="roundHoles" class="form-control">
+              <select id="roundHoles" class="form-control">
                 <option value="9">9</option>
                 <option value="18" selected>18</option>
               </select> 
           </label>
-          <p></p>
+          <br>
           <label for="roundStrokes"># Strokes:
               <input id="roundStrokes" class="form-control form-center" type="number" 
               placeholder="Course played" min="9" max="200" value="80" 
               onChange="updateSGS()" required>
           </label>
-          <p></p>
+          <br>
           <label for="roundTime">Time:<br>
               <input id="roundMinutes" type="number" size="3"
               min="10" max="400" value="50" style="text-align: right"
@@ -206,17 +216,17 @@ small">Courses</span></a>
               min="0" max="60" value="00" onchange="changeSeconds()"
               required>
           </label>
-          <p></p>
+          <br>
           <label for="roundSGS">Speedgolf Score:<br>
               <input id="roundSGS" class="form-center" type="text" size="6" value="130:00" disabled>
           </label>
-          <p></p>
+          <br>
           <label for="roundNotes">Notes:<br>
               <textarea id="roundNotes" class="form-control" rows="6" cols="75" placeholder="Enter round notes""></textarea>
           </label>
-          <p></p>
+          <br>
           <button type="submit" class="btn btn-primary btn-block btncolortheme" 
-            style="width:70%; font-size: 36px">Save</button>
+            style="width:70%; font-size: 36px; z-index: 110"><span id="saveIcon"></span>Save</button>
           </center>
       </form>
   </div>
@@ -236,9 +246,9 @@ small">Courses</span></a>
   
   <!-- START MODAL DIALOG BOX DEFINITION-->
   <div id="aboutModal" class="modal" role="dialog">
-    <div class="modal-dialog modal-lg">
+   
         <!-- Modal content-->
-        <div class="model-content" style="background: #fff">
+        <div class="modal-content" style="background: #fff">
             <div class="modal-header">
               <h3 class="modal-title" style="text-align: center; width:100%"><b>About SpeedScore</b>
                 <button id="modalClose" class="close" 
@@ -287,7 +297,7 @@ small">Courses</span></a>
                   OK</button>
             </div>
         </div>
-    </div>
+   
 </div>
   <!-- END MODAL DIALOG BOX DEFINITION-->
   <!-- Begin SCRIPT section of document. -->
