@@ -35,8 +35,8 @@ for (var i = 0; i < closeBtns.length; ++i) {
 
 //Clear out local storage
 localStorage.clear();
-//Add empty array of round objects to local storage
-localStorage.setItem("rounds",JSON.stringify([]));
+//Add empty associative array of round objects to local storage
+localStorage.setItem("rounds",JSON.stringify({})); 
 //Initially, 0 rounds are stored
 localStorage.setItem("roundCount","0");
 

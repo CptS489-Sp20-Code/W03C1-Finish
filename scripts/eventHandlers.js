@@ -265,14 +265,29 @@ function clearRoundForm() {
   document.getElementById("roundNotes").value = "";
 }
 
+//fillRoundForm -- When the user chooses to view/edit an existing round, we need
+//to fill the round form with the corresponding round data and provide the
+//option to update the data
+function fillRoundForm(round) {
+  document.getElementById("roundDate").valueAsNumber = round.date;
+  document.getElementById("roundCourse").value = round.course;
+  document.getElementById("roundType").value = round.type;
+  document.getElementById("roundHoles").value = round.numHoles;
+  document.getElementById("roundStrokes").value = round.strokes;
+  document.getElementById("roundMinutes").value = round.minutes;
+  document.getElementById("roundSeconds").value = round.seconds;
+  document.getElementById("roundSGS").value = round.SGS;
+  document.getElementById("roundNotes").value = round.notes;
+}
+
 //addRoundToTable -- Helper function that adds a new round to the "My Rounds"
 //table. The round is a "consensed view" that shows only the date, course and
 //scoof the round, together with buttons to view/edit the detailed round data
 //and delete the round data.
 function addRoundToTable() {
-   var allRounds = JSON.parse(localStorage.getItem("rounds"));
+   var rounds = JSON.parse(localStorage.getItem("rounds"));
    var roundCount = localStorage.getItem("roundCount");
-   var last = allRounds.length - 1;
+   var last = Object.keys(rounds).length;
   //Test whether table is empty
   var roundsTable = document.getElementById("myRoundsTable");
   if (roundsTable.rows[1].innerHTML.includes ("colspan")) {
@@ -281,11 +296,14 @@ function addRoundToTable() {
   }
   //Write new row with five cols to table
   var newRound = roundsTable.insertRow(1);
+  newRound.id = "r-" + roundCount; //set id of this row so we can edit/delete later per user input
   newRound.innerHTML = "<td>" + allRounds[last].date + "</td><td>" +
     allRounds[last].course + "</td><td>" + allRounds[last].SGS + " (" + allRounds[last].strokes +
-    " in " + allRounds[last].minutes + ":" + allRounds[last].seconds + ")</td><td><button id='re-" + 
-    roundCount + "'><span class='fas fa-eye'></span>&nbsp;<span class='fas fa-edit'></span></button></td><td><button id='rd-" + roundCount + 
-    "'><span class='fas fa-trash'></span></button></td>";
+    " in " + allRounds[last].minutes + ":" + allRounds[last].seconds + ")</td>" +
+    "<td><button onclick='editRound(" + roundCount + ")'><span class='fas fa-eye'>" +
+    "</span>&nbsp;<span class='fas fa-edit'></span></button></td>" +
+    "<td><button onclick='deleteRound(" + roundCount + ")'>" +
+    "<span class='fas fa-trash'></span></button></td>";
 }
 
 //saveRoundData -- Callback function called from logRoundForm's submit handler.
@@ -295,10 +313,14 @@ function saveRoundData() {
   //Stop spinner
   document.getElementById("saveIcon").classList.remove("fas", "fa-spinner", "fa-spin");
 
-  //Retrieve local storage for rounds -- an array of JavaScript objects
+  //Retrieve local storage for rounds and roundCount
   var rounds = JSON.parse(localStorage.getItem("rounds"));
+  var roundCount = Number(localStorage.getItem("roundCount"));
 
-  //Initialize empty JavaScript object to store this round
+  //increment roundCount since we're adding a new round
+  roundCount++;
+
+  //Initialize empty JavaScript object to store this new round
   var thisRound = {}; //iniitalize empty object for this round
   var e; //temporary value for storying DOM elements as needed
 
@@ -315,11 +337,11 @@ function saveRoundData() {
   thisRound.SGS = document.getElementById("roundSGS").value;
   thisRound.notes = document.getElementById("roundNotes").value;
 
-  //Add this round to array of rounds
-  rounds.push(thisRound);
+  //Add this round to associative array of rounds
+  rounds[roundCount] = thisRound;
 
   //Commit new array to local storage
-  localStorage.setItem("roundCount",Number(localStorage.getItem("roundCount")) + 1);
+  localStorage.setItem("roundCount",roundCount);
   localStorage.setItem("rounds",JSON.stringify(rounds)); 
 
   //Go back to "My Rounds" page by programmatically clicking the menu button
@@ -341,4 +363,9 @@ document.getElementById("logRoundForm").onsubmit = function(e) {
   document.getElementById("saveIcon").classList.add("fas", "fa-spinner", "fa-spin");
   //Set spinner to spin for one second, after which saveRoundData will be called
   setTimeout(saveRoundData,1000);
+}
+
+function editRound(roundNum) {
+  alert("in editRound with roundNum = " + roundNum);
+
 }
