@@ -222,7 +222,7 @@ document.getElementById("loginInterface").onsubmit = function(e) {
 
 //ABOUT BOX
 
-//closeAbout click: When the user clicks a button to cloe the modal About box, hide the
+//closeAbout click: When the user clicks a button to close the modal About box, hide the
 //dialog box. Note that this function is bound to the two items with class
 //"close" in function startUp
 function closeAbout(e) {
@@ -336,7 +336,7 @@ function addOrUpdateRound() {
     " in " + rounds[roundIndex].minutes + ":" + rounds[roundIndex].seconds + ")</td>" +
     "<td><button onclick='editRound(" + roundIndex + ")'><span class='fas fa-eye'>" +
     "</span>&nbsp;<span class='fas fa-edit'></span></button></td>" +
-    "<td><button onclick='deleteRound(" + roundIndex + ")'>" +
+    "<td><button onclick='confirmDelete(" + roundIndex + ")'>" +
     "<span class='fas fa-trash'></span></button></td>";
 }
 
@@ -420,7 +420,7 @@ document.getElementById("logRoundForm").onsubmit = function(e) {
 //editRound: Event handler called when "View/Edit" button clicked in "My Rounds"
 //table. roundIndex indicates the index of the round that was clicked. Grab
 //the round data from local storage, fill it into the edit form and transition
-//to the view/edit round page.
+//to the view/edit round page.                                                                                                                                                                                                                                                                                                                 hhy
 function editRound(roundIndex) {
   //Grab appropriate round to view/edit from localStorage
   var rounds = JSON.parse(localStorage.getItem("rounds"));
@@ -438,13 +438,35 @@ function editRound(roundIndex) {
   transitionToLockedPage("logRoundDiv","View/Edit Round");
 }
 
-//deleteRound: Event handler called when "Delete" button clicked in "My Rounds"
-//table. roundIndex indicates the index of the round taht was clicked. We use
-//roundIndex to delete the data from local storage and to delete the
-//corresponding row of the "My Rounds" table.
-function deleteRound(roundIndex) {
-  //Grab rounds associative array from localStorage
+//confirmDelete: Event handler called when "Delete" button clicked in "My Rounds"
+//table. roundIndex indicates the index of the round tht was clicked. We presenta
+//modal dialog box asking user to confirm the deletion. The confirm button event
+//handler calls on the function deleteRound, which does the deletion.
+function confirmDelete(roundIndex) {
+  //Preserve index of round to delete for deleteRound function
+  localStorage.setItem("pendingDelete",roundIndex); 
+  //Show the modal dialog box
+  document.getElementById("deleteRoundModal").style.display = "block";
+}
+
+//cancelDelete: Event handler called when "No, do not delete" button clicked in
+//the confirm delete modal dialog. In this case, we simply hide the dialog box
+//aclear out the "pendingDelete" local storage item
+function cancelDelete() {
+  localStorage.setItem("pendingDelete","");
+  document.getElementById("deleteRoundModal").style.display = "none";
+}
+
+///deleteRound: Event handler called when "Yes, delete round" button clicked in
+///confirm delete dialog box. We fetch the index of round to delete from local
+///storage and delete the corresponding row from the table and record from the
+///rounds array. We also hide the dialog box.
+function deleteRound() {
+  //Hide modal dialog box
+  document.getElementById("deleteRoundModal").style.display = "none";
+  //Grab rounds associative array and roundIndex from localStorage
   var rounds = JSON.parse(localStorage.getItem("rounds"));
+  var roundIndex = Number(localStorage.getItem("pendingDelete"));
   var row, roundsTable, newRow;
   //delete round from rounds associative array and save back to localStorage
   delete rounds[roundIndex];
