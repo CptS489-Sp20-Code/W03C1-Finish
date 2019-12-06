@@ -83,7 +83,8 @@
         /* side menu button styling */
         .menuBtn {
             background-color:transparent; 
-            border-color:#13294E;
+            border-color: transparent;
+            text-align: center;
         }
 
         .menuItem:hover {
@@ -238,4 +239,8 @@ body {
 .disabledButton {
     pointer-events: none;
     opacity: 0.4;
+}
+
+label {
+    font-weight: bold;
 }

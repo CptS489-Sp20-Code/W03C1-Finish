@@ -135,21 +135,32 @@ var bottomBarBtnClick = function() {
   
 //MENU BUTTON HANDLERS GO HERE
 
+//transitionToLockedPage: Take the user to a locked page that is subsidiary to
+//the main mode page. The new page is identified by lockedPageId and should have
+//the title lockedPageTitle. Note: Any other tweaks to the locked page (e.g., 
+//changing of button labels or hiding/showing of input fields and controls) must
+//be done manually before or after calling this function.
+function transitionToLockedPage(lockedPageId, lockedPageTitle) {
+ //Swap pages:
+ document.getElementById(mode + "MainDiv").style.display = "none";
+ document.getElementById(lockedPageId).style.display = "block";
+ //Change page title:
+ document.getElementById("topBarTitle").textContent = lockedPageTitle;
+ //Set pageLocked to true, thus indicating that we're on a page that may only
+ //be exited by clicking on the left arrow at top left
+ pageLocked = true;
+ //When pageLocked is true, the menu  icon is the left arrow
+ document.getElementById("menuBtnIcon").classList.remove("fa-times");
+ document.getElementById("menuBtnIcon").classList.remove("fa-bars");
+ document.getElementById("menuBtnIcon").classList.add("fa-arrow-left");
+ //When pageLocked is true, the bottom bar buttons are disabled
+ document.getElementById("bottomBar").classList.add("disabledButton");
+}
+
 //logRoundItem click: Take the user to the log round page
 document.getElementById("logRoundItem").onclick = function(e) {
-  //Swap pages:
-  document.getElementById("roundsModeMainDiv").style.display = "none";
-  document.getElementById("logRoundDiv").style.display = "block";
-  //Change page title:
-  document.getElementById("topBarTitle").textContent = "Log New Round";
-  //Set pageLocked to true, thus indicating that we're on a page that may only
-  //be exited by clicking on the left arrow at top left
-  pageLocked = true;
-  //When pageLocked is true, the menu  icon is the left arrow
-  document.getElementById("menuBtnIcon").classList.remove("fa-times");
-  document.getElementById("menuBtnIcon").classList.add("fa-arrow-left");
-  //When pageLocked is true, the bottom bar buttons are disabled
-  document.getElementById("bottomBar").classList.add("disabledButton");
+  transitionToLockedPage("logRoundDiv","Log New Round");
+  document.getElementById("submitBtnLabel").textContent = "Save Round Data";
 }
 
 //aboutBtn click: When the user clicks on "About", launch the modal About dialog
@@ -269,7 +280,7 @@ function clearRoundForm() {
 //to fill the round form with the corresponding round data and provide the
 //option to update the data
 function fillRoundForm(round) {
-  document.getElementById("roundDate").valueAsNumber = round.date;
+  document.getElementById("roundDate").value = round.date;
   document.getElementById("roundCourse").value = round.course;
   document.getElementById("roundType").value = round.type;
   document.getElementById("roundHoles").value = round.numHoles;
@@ -280,29 +291,36 @@ function fillRoundForm(round) {
   document.getElementById("roundNotes").value = round.notes;
 }
 
-//addRoundToTable -- Helper function that adds a new round to the "My Rounds"
+//addOrUpdateRound -- Helper function that adds or updates a  round in "My Rounds"
 //table. The round is a "consensed view" that shows only the date, course and
-//scoof the round, together with buttons to view/edit the detailed round data
+//score for the round, together with buttons to view/edit the detailed round data
 //and delete the round data.
-function addRoundToTable() {
+function addOrUpdateRound() {
+   var addOrUpdate = localStorage.getItem("editOp");
    var rounds = JSON.parse(localStorage.getItem("rounds"));
-   var roundCount = localStorage.getItem("roundCount");
-   var last = Object.keys(rounds).length;
-  //Test whether table is empty
-  var roundsTable = document.getElementById("myRoundsTable");
-  if (roundsTable.rows[1].innerHTML.includes ("colspan")) {
-    //empty table! Need to remove this row before adding new one
-    roundsTable.deleteRow(1);
-  }
-  //Write new row with five cols to table
-  var newRound = roundsTable.insertRow(1);
-  newRound.id = "r-" + roundCount; //set id of this row so we can edit/delete later per user input
-  newRound.innerHTML = "<td>" + allRounds[last].date + "</td><td>" +
-    allRounds[last].course + "</td><td>" + allRounds[last].SGS + " (" + allRounds[last].strokes +
-    " in " + allRounds[last].minutes + ":" + allRounds[last].seconds + ")</td>" +
-    "<td><button onclick='editRound(" + roundCount + ")'><span class='fas fa-eye'>" +
+   var roundsTable = document.getElementById("myRoundsTable");
+   var roundIndex, round; 
+   if (addOrUpdate == "add") {
+     roundIndex = Number(localStorage.getItem("roundCount"));
+     //Test whether table is empty
+     if (roundsTable.rows[1].innerHTML.includes ("colspan")) {
+       //empty table! Need to remove this row before adding new one
+       roundsTable.deleteRow(1);
+     }
+     round = roundsTable.insertRow(1); //insert new row
+     round.id = "r-" + roundIndex; //set id of this row so we can edit/delete later per user input
+   } else { //updating existing round
+     roundIndex = localStorage.getItem("roundIndex");
+     round = document.getElementById("r-" + roundIndex); 
+   }
+
+  //Create/update row with five cols to table
+  round.innerHTML = "<td>" + rounds[roundIndex].date + "</td><td>" +
+    rounds[roundIndex].course + "</td><td>" + rounds[roundIndex].SGS + " (" + rounds[roundIndex].strokes +
+    " in " + rounds[roundIndex].minutes + ":" + rounds[roundIndex].seconds + ")</td>" +
+    "<td><button onclick='editRound(" + roundIndex + ")'><span class='fas fa-eye'>" +
     "</span>&nbsp;<span class='fas fa-edit'></span></button></td>" +
-    "<td><button onclick='deleteRound(" + roundCount + ")'>" +
+    "<td><button onclick='deleteRound(" + roundIndex + ")'>" +
     "<span class='fas fa-trash'></span></button></td>";
 }
 
@@ -313,18 +331,34 @@ function saveRoundData() {
   //Stop spinner
   document.getElementById("saveIcon").classList.remove("fas", "fa-spinner", "fa-spin");
 
-  //Retrieve local storage for rounds and roundCount
+  //Retrieve local storage for rounds
   var rounds = JSON.parse(localStorage.getItem("rounds"));
-  var roundCount = Number(localStorage.getItem("roundCount"));
+  
 
-  //increment roundCount since we're adding a new round
-  roundCount++;
+  //Determine whether we're saving new or editing existing round
+  var submitBtnLabel = document.getElementById("submitBtnLabel").textContent;
+  var roundIndex, roundCount;
 
-  //Initialize empty JavaScript object to store this new round
+  if (submitBtnLabel == "Save Round Data") {
+    //Adding new round
+    localStorage.setItem("editOp","add"); //Flag that we're adding new round
+    //Get roundCount and add 1 to it
+    roundCount = Number(localStorage.getItem("roundCount")) + 1;
+    localStorage.setItem("roundCount", roundCount); //Save roundCount
+    roundIndex = roundCount;
+    localStorage.setItem("roundIndex",roundCount); //Set roundIndex
+  } else {
+    //Editing existing round
+    localStorage.setItem("editOp","update"); //flag that we're editing existing round
+    roundIndex = Number(localStorage.getItem("roundIndex")); //Set roundIndex
+  }
+ 
+    //Initialize empty JavaScript object to store this round
   var thisRound = {}; //iniitalize empty object for this round
   var e; //temporary value for storying DOM elements as needed
 
   //Store the data
+  thisRound.roundNum = roundIndex; //We need this to map a round object back to its index
   thisRound.date = document.getElementById("roundDate").value; //round date
   thisRound.course = document.getElementById("roundCourse").value;
   e = document.getElementById("roundType");
@@ -338,10 +372,9 @@ function saveRoundData() {
   thisRound.notes = document.getElementById("roundNotes").value;
 
   //Add this round to associative array of rounds
-  rounds[roundCount] = thisRound;
+  rounds[roundIndex] = thisRound;
 
-  //Commit new array to local storage
-  localStorage.setItem("roundCount",roundCount);
+  //Commit updated associative array to local storage
   localStorage.setItem("rounds",JSON.stringify(rounds)); 
 
   //Go back to "My Rounds" page by programmatically clicking the menu button
@@ -350,8 +383,10 @@ function saveRoundData() {
   //Clear form to ready for next use
   clearRoundForm();
 
-  //Add new round to "My Rounds" table
-  addRoundToTable();
+  //Add or update round in "My Rounds" table; localStorage "editOp" indicates
+  //what operation we're doing
+  addOrUpdateRound();
+  
 }
 
 //logRoundForm SUBMIT: When the user clicks the "Save" button to save a newly
@@ -361,11 +396,52 @@ document.getElementById("logRoundForm").onsubmit = function(e) {
   
   //Start spinner
   document.getElementById("saveIcon").classList.add("fas", "fa-spinner", "fa-spin");
-  //Set spinner to spin for one second, after which saveRoundData will be called
+  //Set spinner to spin for one second, after which saveRoundData callback will be
+  //called
   setTimeout(saveRoundData,1000);
 }
 
-function editRound(roundNum) {
-  alert("in editRound with roundNum = " + roundNum);
+//editRound: Event handler called when "View/Edit" button clicked in "My Rounds"
+//table. roundIndex indicates the index of the round that was clicked. Grab
+//the round data from local storage, fill it into the edit form and transition
+//to the view/edit round page.
+function editRound(roundIndex) {
+  //Grab appropriate round to view/edit from localStorage
+  var rounds = JSON.parse(localStorage.getItem("rounds"));
+  var round = rounds[roundIndex];
 
+  //Pre-populate form with round data
+  fillRoundForm(round);
+
+  //Set local storage var to index of round being edited. This will allow us to
+  //save updated data to correct round.
+  localStorage.setItem("roundIndex",roundIndex);
+
+  //Transition to round view/edit page with "Update" label for form submit button
+  document.getElementById("submitBtnLabel").textContent = "Update Round Data";
+  transitionToLockedPage("logRoundDiv","View/Edit Round");
+}
+
+//deleteRound: Event handler called when "Delete" button clicked in "My Rounds"
+//table. roundIndex indicates the index of the round taht was clicked. We use
+//roundIndex to delete the data from local storage and to delete the
+//corresponding row of the "My Rounds" table.
+function deleteRound(roundIndex) {
+  //Grab rounds associative array from localStorage
+  var rounds = JSON.parse(localStorage.getItem("rounds"));
+  var row, roundsTable, newRow;
+  //delete round from rounds associative array and save back to localStorage
+  delete rounds[roundIndex];
+  localStorage.setItem("rounds",JSON.stringify(rounds));
+  //delete the row from the table
+  row = document.getElementById("r-" + roundIndex);
+  row.parentNode.removeChild(row);
+  //If we're now down to just header row, we need to add a row saying that no
+  //rounds have been added yet
+  roundsTable = document.getElementById("myRoundsTable");
+  if (roundsTable.rows.length == 1) {
+    //Add new row
+    newRow = roundsTable.insertRow();
+    newRow.innerHTML = "<td colspan='5' style='font-style: italic'>No rounds logged</td>"; 
+  }
 }

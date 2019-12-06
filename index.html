@@ -7,6 +7,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Define Favicon -->
+    <link rel='shortcut icon' type='image/x-icon' href="https://dl.dropboxusercontent.com/s/79q9a1xy2148unf/SpeedScore3Icon.ico" />
     <!-- Begin HEAD section of document. Here we must use HTML comments as shown
     here. -->
     <!-- Default target for all hyperlinks in this file:
@@ -44,10 +46,8 @@
   <!-- The top navigation bar -->
   <div id="navBar" class="navbar">  
     <span class="navbarItems">
-      <button id="menuBtn" style="background-color: transparent;
-      border-color:#13294E; text-align: center">
-        <span id="menuBtnIcon" class="fas fa-bars" style="color:white;
-        font-size: 30px; cursor:pointer; text-align: center">
+      <button id="menuBtn" class="menuBtn">
+        <span id="menuBtnIcon" class="menuBtnIcon fas fa-bars">
         </span>
       </button>
       <img src="http://tiny.cc/sslogo" alt="Speed Score Logo" height="38px"
@@ -167,7 +167,7 @@
         </thead>
         <tbody>
           <tr>
-           <td colspan="5" style="font-style: italic">No rounds added yet</td>
+           <td colspan="5" style="font-style: italic">No rounds logged</td>
           </tr> 
         </tbody>
       </table>
@@ -226,7 +226,8 @@
           </label>
           <br>
           <button id="submitRoundBtn" type="submit" class="btn btn-primary btn-block btncolortheme" 
-            style="width:70%; font-size: 36px; z-index: 110"><span id="saveIcon"></span>Save</button>
+          style="width:70%; font-size: 36px; z-index: 110"><span
+          id="saveIcon">&nbsp;</span><span id="submitBtnLabel"></span></button>
           </center>
       </form>
   </div>
