@@ -53,7 +53,7 @@
 
     //Set default date in log round input form:
     document.getElementById("roundDate").valueAsNumber = 
-      Date.now()-(new Date()).getTimezoneOffset()*60000;
+    Date.now()-(new Date()).getTimezoneOffset()*60000;
   }
 
   //document click: When the user clicks anywhere in the doc and the menu is open
@@ -235,6 +235,22 @@ document.getElementById("logOutBtn").onclick = function(e) {
   //Clear out local storage for next user
   localStorage.clear();
 
+  //Restore Rounds table to initial (empty) state
+  var roundsTable = document.getElementById("myRoundsTable");
+  for (var i = roundsTable.rows.length - 1; i > 0; i--) {
+    roundsTable.deleteRow(i);
+  }
+  var newRow = roundsTable.insertRow();
+  newRow.innerHTML = "<td colspan='5' style='font-style: italic'>No rounds logged</td>"; 
+
+  //Clear round form
+  clearRoundForm();
+
+  //Add empty associative array of round objects to local storage
+  localStorage.setItem("rounds",JSON.stringify({})); 
+  //Initially, 0 rounds are stored
+  localStorage.setItem("roundCount","0");
+
   //Restore starting app state
   startUp();
 };
@@ -353,7 +369,7 @@ function saveRoundData() {
     roundIndex = Number(localStorage.getItem("roundIndex")); //Set roundIndex
   }
  
-    //Initialize empty JavaScript object to store this round
+  //Initialize empty JavaScript object to store this round
   var thisRound = {}; //iniitalize empty object for this round
   var e; //temporary value for storying DOM elements as needed
 
