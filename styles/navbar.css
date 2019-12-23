@@ -16,7 +16,8 @@
         .navbarItems {
           display: inline-flex; 
           align-items: center; 
-          
+          padding-top: 5px; 
+          padding-bottom: 5px;
         }
 
         /* sidenav -- The animated side navigation menu */
@@ -83,8 +84,7 @@
         /* side menu button styling */
         .menuBtn {
             background-color:transparent; 
-            border-color: transparent;
-            text-align: center;
+            border-color:#13294E;
         }
 
         .menuItem:hover {
@@ -138,7 +138,7 @@
       
 /* Styling for the divs in the app. Ensures that the content at top isn't obscured by top bar */
    .paddedPage {
-        padding: 64px 8px 0px 8px;
+        padding: 36px 8px 0px 8px;
         
     }
     
@@ -156,12 +156,10 @@
 /* Styling for a navbar at the bottom of the page */
 .bottombar {
     background-color: #13294E;
-    color: white;
     overflow: hidden;
     position: fixed;
     bottom: 0;
     width: 100%;
-    z-index: 100;
 }
 
 /* Style the links inside the bottom nav bar */
@@ -198,7 +196,6 @@
 .bottomBarText {
     display:block;
     font-size: small;
-    padding-top: 3px;
 }
 
 /* Style the floating action button, which is fixed in the lower right of the app */
@@ -239,8 +236,4 @@ body {
 .disabledButton {
     pointer-events: none;
     opacity: 0.4;
-}
-
-label {
-    font-weight: bold;
 }

@@ -11,19 +11,6 @@
             "url": "http://localhost:5500",
             "webRoot": "${workspaceFolder}"
         },
-        {
-            "type": "chrome",
-            "request": "attach",
-            "name": "Attach to Chrome",
-            "port": 5500,
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:5500",
-            "webRoot": "${workspaceFolder}"
-        }
+       
     ]
 }

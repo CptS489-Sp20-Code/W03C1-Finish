@@ -7,9 +7,6 @@ includeHTML();
 var menuOpen = false; 
 //Variable captures current UI mode
 var mode = "loginMode"; 
-//We'll use this to indicate we're on a "locked" page where you have to click
-//left arrow to get back to main mode page.
-var pageLocked = false;
 
 //Associative array maps modes to page titles
 var modeToTitle = {"feedMode": "Activity Feed",
@@ -19,6 +16,10 @@ var modeToTitle = {"feedMode": "Activity Feed",
 
 //Array of app modes -- useful for iterating through mode pages
 var modes = ["loginMode","feedMode","roundsMode","coursesMode"];
+
+//We'll use this to indicate we're on a "locked" page where you have to click
+//left arrow to get back to main mode page.
+var pageLocked = false;
 
 //Bind bottomBarBtnClick function to all elements of class bottomBarBtn
 var bottomBtns = document.getElementsByClassName("bottomBarBtn");
@@ -31,14 +32,6 @@ var closeBtns = document.getElementsByClassName("close");
 for (var i = 0; i < closeBtns.length; ++i) {
     closeBtns[i].addEventListener("click",closeAbout);
 }
-
-
-//Clear out local storage
-localStorage.clear();
-//Add empty associative array of round objects to local storage
-localStorage.setItem("rounds",JSON.stringify({})); 
-//Initially, 0 rounds are stored
-localStorage.setItem("roundCount","0");
 
 //Execute function to set start state of app
 startUp();
